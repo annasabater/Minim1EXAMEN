@@ -42,5 +42,4 @@ public class TextService {
     public String throwIt() throws Exception {
         throw new Exception("My Exception");
     }
-
 }

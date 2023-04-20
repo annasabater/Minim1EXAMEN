@@ -1,53 +1,46 @@
 package gm;
 
-import java.util.List;
-
 public class Juego{
-    private String idJuego;
-    private String descJuego;
-    private int numNivell;
-    private int puntosPorNivel;
-    private List<Usuario> listaUsuario;
+    // Estados del juego
+    private static final int NO_INICIADO = 0;
+    private static final int INICIADO_EN_PREPARACION = 1;
+    public static final int INICIADO_EN_FUNCIONAMIENTO = 2;
+    private static final int FINALIZADO = 3;
 
-    public Juego (String idJuego, String descJuego, int numNivell, int puntosPorNivel){
-        this.idJuego = idJuego;
-        this.descJuego = descJuego;
-        this.numNivell = numNivell;
-        this.puntosPorNivel = puntosPorNivel;
-    }
-    public Juego (String juego){
-    }
+    // Variables de instancia
+    private int nEquipos;
+    private int dimensionEquipo;
+    private int estado;
 
-    public Integer getPuntosPorNivel() {
-        return puntosPorNivel;
+    public Juego(int nEquipos, int dimensionEquipo) {
+        this.nEquipos = nEquipos;
+        this.dimensionEquipo = dimensionEquipo;
+        this.estado = NO_INICIADO;
     }
-
-    public void setPuntosPorNivel(Integer puntosPorNivel) {
-        this.puntosPorNivel = puntosPorNivel;
+    public Juego (){
     }
 
-    public String getIdJuego() {
-        return idJuego;
+    public int getnEquipos() {
+        return nEquipos;
     }
 
-    public void setIdJuego(String idJuego) {
-        this.idJuego = idJuego;
+    public void setnEquipos(int nEquipos) {
+        this.nEquipos = nEquipos;
     }
 
-    public String getDescJuego() {
-        return descJuego;
+    public int getDimensionEquipo() {
+        return dimensionEquipo;
     }
 
-    public void setDescJuego(String descJuego) {
-        this.descJuego = descJuego;
+    public void setDimensionEquipo(int dimensionEquipo) {
+        this.dimensionEquipo = dimensionEquipo;
     }
 
-    public Integer getNumNivell() {
-        return numNivell;
+    public int getEstado() {
+        return estado;
     }
 
-    public void setNumNivell(Integer numNivell) {
-        this.numNivell = numNivell;
+    public void setEstado(int estado) {
+        this.estado = estado;
     }
-
 }
