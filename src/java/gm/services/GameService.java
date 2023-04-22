@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,193 +18,222 @@ import static gm.GameManagerImpl.logger;
 @Path("game")
 public class GameService {
     private GameManager gm;
+
     public GameService() {
         this.gm = GameManagerImpl.getInstance();
         //Si no hay juegos, crea algunos
-        if (gm.sizeJuegos()==0){
+        if (gm.sizeJuegos() == 0) {
             this.gm.crearJuego(1, 5);
             this.gm.crearJuego(2, 3);
-            this.gm.crearJuego(1, 20);
         }
         //Si no hay usuarios, crea algunos
-        if (gm.sizeUsuarios()==0){
-            this.gm.addUsuario("Sara");
-            this.gm.addUsuario("Anna");
+        if (gm.sizeUsuarios() == 0) {
+            this.gm.addUsuario("Kevin");
+            this.gm.addUsuario("David");
         }
         //Si no hay productos, crea algunos
         if (gm.sizeProducto() == 0) {
-            this.gm.crearProducto("1", "Camisera", 25);
-            this.gm.crearProducto("2", "Pantalon", 50);
-            this.gm.crearProducto("3", "Chaleco", 80);
+            this.gm.crearProducto("1", "Camisera", 20);
+            this.gm.crearProducto("2", "Sudadera", 23);
         }
     }
+
     @POST
-    @ApiOperation(value = "Create Game", notes = "")
+    @ApiOperation(value = "Crear juego", notes = "")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Game created", response = Juego.class),
-            @ApiResponse(code = 400, message = "Invalid request"),
+            @ApiResponse(code = 200, message = "Juego creado", response = Juego.class),
+            @ApiResponse(code = 400, message = "No creado"),
     })
-    @Path("/juegos/crearJuego")
+    @Path("/juego/crearJuego/{N}/{P}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response crearJuego(@QueryParam("N") int N, @QueryParam("P") int P) {
-        Juego juego = gm.crearJuego(N, P);
+    public Response crearJuego(@PathParam("N") int N, @PathParam("P") int P) {
+        Juego juego = this.gm.crearJuego(N, P);
         if (juego == null) {
             return Response.status(400).build();
         }
-        return Response.status(201).entity(juego).build();
+        return Response.status(200).entity(juego).build();
     }
 
-
-    @GET
-    @ApiOperation(value = "crear usuario", notes = " ")
+    @POST
+    @ApiOperation(value = "Crear usuario", notes = "")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "User created", response = Usuario.class),
-            @ApiResponse(code = 404, message = "Invalid request"),
+            @ApiResponse(code = 200, message = "Usuario creado", response = Usuario.class),
+            @ApiResponse(code = 400, message = "No creado"),
     })
-    @Path("/usuario/crearUsuario")
+    @Path("/usuario/crearUsuario/{id}/{nombre}/{apellidos}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response crearUsuario(Usuario request) {
-        Usuario usuario = new Usuario(request.getIdUsuario(), request.getNombreUsuario(), request.getApellidoUsuario(), request.getDsaCoins());
-        this.gm.crearUsuario(usuario.getIdUsuario(), usuario.getNombreUsuario(), usuario.getApellidoUsuario());
-        logger.info("Usuario creado con id " + usuario.getIdUsuario());
-        return Response.status(201).entity(usuario).build();
+    public Response crearUsuario(@PathParam("id") String id, @PathParam("nombre") String nombre, @PathParam("apellidos") String apellidos) {
+        this.gm.crearUsuario(id,nombre, apellidos);
+        Usuario usuario = this.gm.getUser(id);
+        if (usuario == null) {
+            return Response.status(400).build();
+        }
+        return Response.status(200).entity(usuario).build();
     }
 
     @PUT
-    @ApiOperation(value = "Create product", notes = " ")
+    @ApiOperation(value = "Crear producto", notes = " ")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Product created", response = Producto.class),
-            @ApiResponse(code = 404, message = "Invalid request"),
+            @ApiResponse(code = 200, message = "Producto creado", response = Producto.class),
+            @ApiResponse(code = 400, message = "No creado"),
     })
-    @Path("/productos/crearProducto")
-    public Response crearProducto(@QueryParam("id") String id, @QueryParam("descripcion") String descripcion, @QueryParam("precio") int precio) {
+    @Path("/productos/crearProducto/{id}/{descripcion}/{precio}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response crearProducto(@PathParam("id") String id, @PathParam("descripcion") String descripcion, @PathParam("precio") int precio) {
         if (this.gm.getProducto(id) != null) {
-            logger.warn("Ya existe un producto con id " + id);
+            logger.warn("Ya existe un producto con id " +id);
             return Response.status(400).build();
         }
         this.gm.crearProducto(id, descripcion, precio);
-        logger.info("Producto creado con id " + id);
-        return Response.status(201).entity(this.gm.getProducto(id)).build();
-    }
-/*
-    @GET
-    @ApiOperation(value = "get actual points", notes = "Get the actual points of a player")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "All good", response = String.class, responseContainer="List"),
-            @ApiResponse(code = 404, message = "Player or game does not exists"),
-    })
-    @Path("/usuario/{idU}/getNumNivelActual")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getNumNivelActual(@PathParam("idU") String idU) {
-        int lvl = this.gm.getNumNivellActual(idU);
-        if (lvl>=0){
-            return Response.status(201).entity(lvl).build();
-        }
-        return Response.status(404).build();
-    }
-
-    @GET
-    @ApiOperation(value = "get actual points", notes = "Get the actual points of a player")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "All good", response = String.class, responseContainer="List"),
-            @ApiResponse(code = 404, message = "Player or game does not exists"),
-    })
-    @Path("/usuario/{idU}/getNumPuntos")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getNumPuntos(@PathParam("idU") String idU) {
-        int puntos = Integer.parseInt(this.gm.getNumPuntos(idU));
-        if (puntos >=0){
-            return Response.status(201).entity(puntos).build();
-        }
-        return Response.status(404).build();
+        logger.info("Producto creado con id" + id+ "descripcon" +descripcion+ "precio" +precio);
+        return Response.status(200).entity(this.gm.getProducto(id)).build();
     }
 
     @PUT
-    @ApiOperation(value = "Advance lvl", notes = "Make the user move 1 lvl")
+    @ApiOperation(value = "Comprar producto", notes = " ")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Next lvl"),
-            @ApiResponse(code = 202, message = "Game ended"),
-            @ApiResponse(code = 404, message = "Player/game does not exist")
+            @ApiResponse(code = 200, message = "Compra exha"),
+            @ApiResponse(code = 400, message = "BAD_REQUEST"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
     })
-    @Path("/usuario/pasarNivel/¨{idU}/{puntosAcumulados}/{fechaInicio}")
-    public Response pasarNivel(@PathParam("idU") String idU, @PathParam("puntosAcumulados") int puntosAcumulados, @PathParam("fechaInicio")String fechaInicio) {
-        Usuario u = this.gm.pasarNivel(idU,puntosAcumulados,fechaInicio);
-        if(u==null){
+    @Path("/productos/comprarProducto/{idProducto}/{idUsuario}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response comprarProducto(@PathParam("idProducto") String idProducto, @PathParam("idUsuario") String idUsuario) {
+        if (this.gm.getProducto(idProducto)==null||this.gm.getUser(idUsuario)==null) {
+            logger.warn("No encontrdo");
             return Response.status(404).build();
         }
-        if (u.getJugando()==true){
+        //comprovamos si el usuario tiene suficientes DSACOINS para comprar el producto
+        Usuario usuario = this.gm.getUser(idUsuario);
+        Producto producto = this.gm.getProducto(idProducto);
+        int precio = producto.getPrecio();
+        int dsaCoins= usuario.getDsaCoins();
+        if (dsaCoins>=precio) {
+            usuario.setDsaCoins(dsaCoins-precio);
+            logger.info("Compra echa");
             return Response.status(200).build();
+        } else {
+            logger.warn("insuficiente DsaCoins");
+            return Response.status(400).build();
         }
-        return Response.status(202).build();
+    }
+
+    @POST
+    @ApiOperation(value = "Iniciar partida", notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Partida iniciada", response = Juego.class),
+            @ApiResponse(code = 400, message = "BAD_REQUEST"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
+    })
+    @Path("/juego/iniciarPartida/{idUsuario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response iniciarPartida(@PathParam("idUsuario") String idUsuario) {
+        Juego juego= this.gm.iniciarPartida(idUsuario); //cridem al metodo iniciarParitda del tipo Juego
+        if (juego == null) {
+            return Response.status(404).build();
+        } else if (juego.getEstado()==Juego.INICIADO_EN_FUNCIONAMIENTO) { //Juego iniciado
+            return Response.status(400).entity("El juego" + juego.getIdJuego() + "funciona").build();
+        }
+        return Response.status(200).build();
+    }
+
+    @GET
+    @ApiOperation(value = "Consultar estado", notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Estado consultado"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
+    })
+    @Path("/juegos/consultarEstado")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response consultarEstado() {
+        if (this.gm.sizeJuegos()== 0) {//miramos si hay algun juego creado
+            return Response.status(404).entity("No se crra ningun juego").build();
+        } else {
+            String estado=this.gm.consultarEstado(); //devuelve el estado el juego
+            return Response.status(200).entity("Estado juego:" + estado).build();
+        }
     }
 
     @PUT
-    @ApiOperation(value = "End a match", notes = "End a match")
+    @ApiOperation(value = "Disminuir vida usuario", notes = " ")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Match ended"),
-            @ApiResponse(code = 404, message = "Player/match does not exist"),
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
     })
-    @Path("/usuario/finalizarPartida/{idU}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response finalizarPartida(@PathParam("idU") String id) {
-        Usuario u = this.gm.finalizarPartida(id);
-        if (u!=null){
-            return Response.status(201).build();
-        }
-        return Response.status(404).build();
-    }
-
-    @GET
-    @ApiOperation(value = "get users by game", notes = "Get the users that have played a specific game")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "All good", response = Usuario.class, responseContainer="List"),
-            @ApiResponse(code = 404, message = "Game does not exists"),
-    })
-    @Path("/juego/{juego}/usuarios")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response consultarUsuariosPorJuego(@PathParam("juego") String juego) {
-        Juego juegoObj = new Juego(); // create the game object from the string parameter
-        List<Usuario> usuarios = (List<Usuario>) this.gm.consultarUsuariosPorJuego(juegoObj);
-        if (usuarios == null) {
+    @Path("/usuario/disminuirVida/{idUsuario}/{cantidad}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response disminuirVida(@PathParam("idUsuario") String idUsuario, @PathParam("cantidad") int cantidad) {
+        Usuario usuario= this.gm.getUser(idUsuario);
+        if (usuario == null) {
+            logger.warn("No existe el usuario con ID " + idUsuario);
             return Response.status(404).build();
         }
-        return Response.status(201).entity(usuarios).build();
-    }
-
-    @GET
-    @ApiOperation(value = "Get player's match", notes = "")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "All good", response = Producto.class, responseContainer="List"),
-            @ApiResponse(code = 404, message = "Something went wrong")
-    })
-    @Path("/usuario/{nomUsuario}/partidaUsuario")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response partidaUsuario(@PathParam("nomUsuario") String id) {
-        List<Producto> matches = this.gm.partidaUsuario(id);
-        if(matches.size()!=0){
-            GenericEntity<List<Producto>> entity = new GenericEntity<List<Producto>>(matches){};
-
-            return Response.status(201).entity(entity).build();
+        this.gm.disminuirVida(idUsuario, cantidad);
+        int nuevaVida=usuario.getVida() - cantidad;
+        if (nuevaVida<=0) { //establecemos la vida del usuario en 0
+            usuario.setVida(0);
+            logger.info("Usuario " + usuario.getNombreUsuario() + "muerto");
+        } else {
+            usuario.setVida(nuevaVida); //actualiza vida usuario
+            logger.info("Vida usuario " +usuario.getNombreUsuario()+"actualizada" +nuevaVida);
         }
-        return Response.status(404).build();
+        return Response.status(200).build();
     }
 
     @GET
-    @ApiOperation(value = "get activity information", notes = "Get the activity information of a player in a specific game")
+    @ApiOperation(value = "Consultar vida", notes = " ")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "All good", response = String.class, responseContainer="List"),
-            @ApiResponse(code = 404, message = "Player or game does not exists"),
+            @ApiResponse(code = 200, message = "Usuario encontrado"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
     })
-    @Path("/usuario/{nomUsuario}/juego/{juego}/infoActividad")
+    @Path("/usuario/consultarVida/{idUsuario}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response infoActividad(@PathParam("nomUsuario") String nomUsuario, @PathParam("juego") String juego) {
-        Juego juegoObj = new Juego();
-        List<String> infoActividad = this.gm.infoActividad(nomUsuario, juegoObj);
-        if (infoActividad == null) {
+    public Response consultarVida(@PathParam("idUsuario") String idUsuario) {
+        int vida = this.gm.consultarVida(idUsuario); //obtenemos la vida del usuario
+        if (vida == -1) {// si no existe NOTFOUND
             return Response.status(404).build();
         }
-        return Response.status(201).entity(infoActividad).build();
+        return Response.status(200).entity(vida).build();
     }
-*/
+
+    @GET
+    @ApiOperation(value = "Consultar vida  equipo", notes = " ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
+    })
+    @Path("/equipo/consultarVida/{idEquipo}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response consultarVidaEquipo(@PathParam("idEquipo") int idEquipo) {
+        int vidaEquipo=this.gm.consultarVidaEquipo(idEquipo);//obtenemos la vida del equipo
+        if (vidaEquipo==0) {
+            logger.warn("No se ha encontrado el equipo" + idEquipo);
+            return Response.status(404).build();
+        }
+        logger.info("El valor de vida del equipo " + idEquipo + "es" + vidaEquipo);
+        return Response.status(200).entity(vidaEquipo).build();
+    }
+
+    @PUT
+    @ApiOperation(value = "Finalizar juego", notes = " ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "NOT_FOUND")
+    })
+    @Path("/juego/finalizarJuego")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response finalizarJuego(Juego juego) {
+        Juego juegoExistente = this.gm.buscarJuego(juego.getIdJuego());
+        if (juegoExistente == null) {
+            logger.warn("No se ha encontrado el juego " +juego.getIdJuego());
+            return Response.status(404).build();
+        }
+        this.gm.finalizarJuego(juego);
+        logger.info("El juego "+juego.getIdJuego()+"ha finalizado");
+        return Response.status(200).build();
+    }
 }

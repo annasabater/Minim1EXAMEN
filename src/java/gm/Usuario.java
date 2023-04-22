@@ -1,10 +1,11 @@
 package gm;
 
-public class Usuario {
+public class Usuario extends Equipo {
     private String idUsuario;
     private String nombreUsuario;
     private String apellidoUsuario;
     private int dsaCoins;
+    private Equipo equipo;
 
     public Usuario(String idUsuario, String nombreUsuario, String apellidoUsuario, int dsaCoins){
         this.idUsuario = idUsuario;
@@ -47,8 +48,17 @@ public class Usuario {
     public void setDsaCoins(int dsaCoins) {
         this.dsaCoins = dsaCoins;
     }
+
+    public Equipo getEquipo() {
+        return equipo;
+    }
+
+    public void setEquipo(Equipo equipo) {
+        this.equipo = equipo;
+    }
+
     @Override
     public String toString() {
-        return "Usuario{" + "identificador='" + idUsuario + '\'' + ", nombre='" + nombreUsuario + '\'' + ", apellidos='" + apellidoUsuario + '\'' + ", dsaCoins=" + dsaCoins + '}';
+        return "Usuario{" + "identificador:'" + idUsuario + ", nombre:" + nombreUsuario +" apellidos:'" + apellidoUsuario + " dsaCoins:" + dsaCoins + " equipo:" + equipo + '}';
     }
 }

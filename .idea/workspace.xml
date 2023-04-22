@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1897d370-5582-4543-81b1-4954e077b141" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/java/gm/Equipo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/java/gm/services/List.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/gm/Equipo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/Equipo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/java/gm/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/GameManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/java/gm/GameManagerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/GameManagerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/java/gm/Juego.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/Juego.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/java/gm/Partida.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/Producto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/gm/Producto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/Producto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/java/gm/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/Usuario.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/java/gm/services/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/services/GameService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/java/gm/services/TextService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/gm/services/TextService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/GameManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/GameManagerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,6 +84,9 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="gm.services" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Anna Sabater Nualart\IntelliJ IDEA\Minim1_2022QT\src\java\gm" />
     </key>
@@ -103,9 +105,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="generated-requests | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" requestIdentifier="#1" runType="Run single request">
-      <method v="2" />
-    </configuration>
     <configuration name="GameManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Minim1_2022QT" />
       <option name="PACKAGE_NAME" value="" />
@@ -115,21 +114,31 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="GameManagerTest.testCrearProducto" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="GameManagerTest.testComprarProducto" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Minim1_2022QT" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="GameManagerTest" />
-      <option name="METHOD_NAME" value="testCrearProducto" />
+      <option name="METHOD_NAME" value="testComprarProducto" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="GameManagerTest.testFinalizarPartida" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="GameManagerTest.testCrearJuego" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Minim1_2022QT" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="GameManagerTest" />
-      <option name="METHOD_NAME" value="testFinalizarPartida" />
+      <option name="METHOD_NAME" value="testCrearJuego" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GameManagerTest.testFinalizarJuego" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Minim1_2022QT" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="GameManagerTest" />
+      <option name="METHOD_NAME" value="testFinalizarJuego" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -138,10 +147,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
-        <item itemvalue="JUnit.GameManagerTest.testCrearProducto" />
-        <item itemvalue="HTTP Request.generated-requests | #1" />
-        <item itemvalue="JUnit.GameManagerTest.testFinalizarPartida" />
         <item itemvalue="JUnit.GameManagerTest" />
+        <item itemvalue="JUnit.GameManagerTest.testFinalizarJuego" />
+        <item itemvalue="JUnit.GameManagerTest.testComprarProducto" />
+        <item itemvalue="JUnit.GameManagerTest.testCrearJuego" />
       </list>
     </recent_temporary>
   </component>
@@ -162,7 +171,10 @@
       <workItem from="1681567111014" duration="4208000" />
       <workItem from="1681831526371" duration="6914000" />
       <workItem from="1681886093963" duration="22327000" />
-      <workItem from="1681995276888" duration="10754000" />
+      <workItem from="1681995276888" duration="11052000" />
+      <workItem from="1682107008779" duration="6791000" />
+      <workItem from="1682144468631" duration="11678000" />
+      <workItem from="1682156405431" duration="7061000" />
     </task>
     <servers />
   </component>

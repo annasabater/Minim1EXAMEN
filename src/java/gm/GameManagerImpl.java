@@ -40,8 +40,10 @@ public class GameManagerImpl implements GameManager {
         for (int i = 0; i < N; i++) {
             equipoHashMap.put(String.valueOf(i), new Equipo(i, P));
         }
-        juegosList.add(new Juego(N, P));
-        logger.info("Juego creado con " + N + " equipos de " + P + " personas cada uno");
+        Juego juego = new Juego(N, P);
+        juego.setEstado(Juego.INICIADO_EN_PREPARACION);
+        juegosList.add(juego);
+        logger.info("Juego creado con "+ N+ " equipos de" + P + "personas");
         return null;
     }
 
@@ -49,9 +51,9 @@ public class GameManagerImpl implements GameManager {
     public void crearUsuario(String id, String nombre, String apellidos){
         if (!this.usuarioHashMap.containsKey(id)) {
             this.usuarioHashMap.put(id, new Usuario(id, nombre, apellidos, 25));
-            logger.info("Creamos usario con id " + id );
+            logger.info("Creamos usario con id " +id + "nombre:" +nombre+ "apellidos");
         } else {
-            logger.warn("Ya existe el usuario con id " + id);
+            logger.warn("Ya existe el usuario con id " +id);
         }
     }
 
@@ -64,6 +66,8 @@ public class GameManagerImpl implements GameManager {
             logger.warn("Ya existe producto con id " + id);
         }
     }
+
+    //Compra de un producto por parte de un usuario
     public void comprarProducto(String idProducto, String idUsuario) {
         if (productoHashMap.containsKey(idProducto) && usuarioHashMap.containsKey(idUsuario)) {
             Usuario usuario = usuarioHashMap.get(idUsuario);
@@ -80,33 +84,79 @@ public class GameManagerImpl implements GameManager {
             logger.warn("No se enccontro el producto o el usuario");
         }
     }
-    public void iniciarPartida(String idUsuario) {
-        //FALTA
+
+    // Inicio de una partida por parte de un usuario
+    public Juego iniciarPartida(String idUsuario) {
+        Juego juego = buscarJuego(idUsuario);
+        if (juego == null) {
+            logger.warn("No se ha encontrado el juego "+ idUsuario);
+            return null;
+        }
+        if (juego.getEstado() == juego.INICIADO_EN_FUNCIONAMIENTO) {
+            logger.warn("El juego"+ juego.getIdJuego()+ "INICIADO_EN_FUNCIONAMIENTO");
+            return juego;
+        }
+        Usuario usuario = buscarUsuario(idUsuario);
+        if (usuario == null) {
+            logger.warn("No se ha encontrado el usuario" +idUsuario);
+            return null;
+        }
+        int equipoCompleto = juego.getDimensionEquipo();
+        if (juego.getDimensionEquipo()!=0) {
+            logger.info("Se ha añadido una partida para el usuario" +idUsuario+"del juego"+juego.getIdJuego());
+            return juego;
+        }
+        iniciarJuego(juego);
+        return juego;
     }
+    private void iniciarJuego(Juego juego) {
+        juego.setEstado(Juego.INICIADO_EN_FUNCIONAMIENTO);
+        logger.info(juego.getIdJuego() + "INICIADO_EN_FUNCIONAMIENTO");
+    }
+
+    // Consulta el estado del juego
     public String consultarEstado(){
         if (juegosList.isEmpty()) {
             return "No se ha creado ningun juegp";
         } else {
-            Juego juego = juegosList.get(juegosList.size() - 1);
-            return "estado juego: " + juego.getEstado();
+            Juego juego = juegosList.get(juegosList.size()-1);
+            return "estado juego:" + juego.getEstado();
         }
     }
 
-    public void disminuirVida(String idUsuario, int cantidad){
-        Usuario usuario = usuarioHashMap.get(idUsuario);
-        if (usuario == null) {
-            logger.warn("no existe eñ usuario con ID " + idUsuario);
+    //Actualización del valor de vida de un usuario
+    public Usuario disminuirVida(String idUsuario, int cantidad){
+        Juego juegoActual = juegosList.get(juegosList.size()- 1);
+        if (juegoActual == null) {
+            logger.warn("No hay juego en curso");
+            return null;
         }
-    }
-    public int consultarVida(String idUsuario){ //MIRAR
         Usuario usuario = usuarioHashMap.get(idUsuario);
         if (usuario == null) {
-            logger.warn("No existe usuario " + idUsuario);
+            logger.warn("No existe el usuario con ID "+ idUsuario);
+            return usuario;
+        }
+        int nuevaVida = usuario.getVida() - cantidad;
+        if (nuevaVida <= 0) {
+            usuario.setVida(0);
+            logger.info("Usuario "+ usuario.getNombreUsuario() +"muerto");
+        } else {
+            usuario.setVida(nuevaVida);
+            logger.info("Vida del usuario" + usuario.getNombreUsuario()+" actualizada a " +nuevaVida);
+        }
+        return usuario;
+    }
+
+    // Consulta el valor de vida actual de un usuario
+    public int consultarVida(String idUsuario){
+        Usuario usuario = usuarioHashMap.get(idUsuario);
+        if (usuario == null) {
+            logger.warn("Noexiste el usario con id" + idUsuario);
             return -1;
         }
-        Equipo equipoUsuario = null;
-        if (equipoUsuario == null) {
-            logger.warn("Noexiste el usario con id " + idUsuario);
+        Equipo eq = usuario.getEquipo();
+        if (eq == null) {
+            logger.warn("Noexiste el usario con id" + idUsuario);
             return -1;
         }
         Juego juegoActivo = null;
@@ -117,36 +167,59 @@ public class GameManagerImpl implements GameManager {
             }
         }
         if (juegoActivo == null) {
-            logger.warn("No hay un juego activo.");
+            logger.warn("No hay un juego en marcha");
             return -1;
         }
-        int vidaUsuario = equipoUsuario.getVida(usuario);
+        int vidaUsuario = eq.getVida();
         return vidaUsuario;
     }
-    public int consultarVidaEquipo(int numEquipo){ //MIRAR
-        return numEquipo;
-    }
-    public void finalizarJuego(){
-        //FALTA
+
+    // Consulta el valor de vida de un equipo
+    public int consultarVidaEquipo(int idEquipo) {
+        Equipo equipo = buscarEquipo(String.valueOf(idEquipo));
+        if (equipo == null) {
+            logger.warn("equipo no encontrado" + idEquipo);
+            return 0;
+        }
+        int vidaEquipo = 0;
+        for (Equipo eq : equipo.getJugadores()) {
+            vidaEquipo += eq.getVida();
+        }
+        logger.info("Vida equipo" + idEquipo +vidaEquipo);
+        return vidaEquipo;
     }
 
+    //Finalizar el juego
+    public void finalizarJuego(Juego juego){
+        juego.setEstado(Juego.FINALIZADO);
+        logger.info(juego.getIdJuego() + "FINALIZADO");
+    }
 
     @Override
-    public Usuario getUser(String idUser) {
-        logger.info("Buscando un jugador con el siguiente id: " + idUser);
-        if(this.usuarioHashMap.get(idUser)==null){
+    public Usuario addUsuario(String idUsuario){
+        if(getUser(idUsuario)==null){
+            logger.warn("El usuario no existe, lo añadimos");
+            return getUser(idUsuario);
+        }
+        return null;
+    }
+
+    public Usuario addProducto(String idProducto){
+        if(getUser(idProducto)==null){
+            logger.warn("El producto no existe, lo añadimos");
+            return getUser(idProducto);
+        }
+        return null;
+    }
+
+    @Override
+    public Usuario getUser(String idUsuario) {
+        logger.info("Buscando un jugador con el siguiente id: " + idUsuario);
+        if(this.usuarioHashMap.get(idUsuario)==null){
             logger.warn("Jugador no encontrado");
             return null;
         }
-        return this.usuarioHashMap.get(idUser);
-    }
-    @Override
-    public Usuario addUsuario(String idUser){
-        if(getUser(idUser)==null){
-            logger.warn("El usuario no existe, lo añadimos");
-            return getUser(idUser);
-        }
-        return null;
+        return this.usuarioHashMap.get(idUsuario);
     }
 
     @Override
@@ -158,7 +231,30 @@ public class GameManagerImpl implements GameManager {
         }
         return this.productoHashMap.get(idProducto);
     }
+    public Juego getJuego(String idJuego){
+        logger.info("Buscando Juego con el siguiente id: " + idJuego);
+        if(this.juegosList.get(Integer.parseInt(idJuego))==null){
+            logger.warn("Juego no encontrado");
+            return null;
+        }
+        return this.juegosList.get(Integer.parseInt(idJuego));
+    }
 
+    public Juego buscarJuego(String identificadorJuego) {
+        for (Juego juego : juegosList) {
+            if (juego.getIdJuego().equals(identificadorJuego)) {
+                return juego;
+            }
+        }
+        return null; // Si no se encuentra el juego, se devuelve null
+    }
+
+    public Usuario buscarUsuario(String identificadorUsuario){
+        return usuarioHashMap.get(identificadorUsuario);
+    }
+    public Equipo buscarEquipo(String identificadorEquipo){
+        return equipoHashMap.get(identificadorEquipo);
+    }
 
     @Override
     public void clear(){

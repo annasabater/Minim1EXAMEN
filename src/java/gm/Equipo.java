@@ -28,7 +28,7 @@ public class Equipo {
         jugadores.add(jugador);
     }
 
-    public int getVida(Usuario usuario) {
+    public int getVida() {
         return vida;
     }
 
